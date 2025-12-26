@@ -122,11 +122,10 @@ export default async function MyListingsPage() {
                 </div>
                 </Link>
 
-                <div className="flex gap-2 flex-shrink-0 pr-6 relative z-10">
+                <div className="flex gap-2 flex-shrink-0 pr-6">
                   {listing.transferCode && (
                     <Link
                       href={`/listings/${listing.id}/transfer-instructions`}
-                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-50 font-medium"
                     >
                       📧 Instructions
@@ -135,7 +134,6 @@ export default async function MyListingsPage() {
                   {listing.status === "ACTIVE" && (
                     <Link
                       href={`/listings/${listing.id}/edit`}
-                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
                     >
                       Edit
