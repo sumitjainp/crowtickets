@@ -177,8 +177,16 @@ export default async function ListingsPage({
                     )}
                   </div>
 
-                  {/* Cancellation Policy Badge */}
-                  <div className="mb-4">
+                  {/* Badges */}
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {/* Verification Badge */}
+                    {listing.verificationStatus === "VERIFIED" && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded">
+                        ✓ Verified
+                      </span>
+                    )}
+
+                    {/* Cancellation Policy Badge */}
                     {listing.cancellationPolicy === "STRICT" && (
                       <span className="inline-flex items-center gap-1 text-xs font-medium bg-red-50 text-red-700 border border-red-200 px-2 py-1 rounded">
                         🔒 Strict Policy

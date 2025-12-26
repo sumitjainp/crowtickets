@@ -76,19 +76,36 @@ export default async function MyListingsPage() {
                         {listing.eventName} • {listing.venue}
                       </p>
                     </div>
-                    <span
-                      className={`ml-4 px-3 py-1 text-sm font-medium rounded-full flex-shrink-0 ${
-                        listing.status === "ACTIVE"
-                          ? "bg-green-100 text-green-800"
-                          : listing.status === "SOLD"
-                          ? "bg-blue-100 text-blue-800"
-                          : listing.status === "EXPIRED"
-                          ? "bg-gray-100 text-gray-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {listing.status}
-                    </span>
+                    <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                      {listing.verificationStatus === "VERIFIED" && (
+                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1">
+                          ✓ Verified
+                        </span>
+                      )}
+                      {listing.verificationStatus === "PENDING" && (
+                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1">
+                          ⏳ Pending
+                        </span>
+                      )}
+                      {listing.verificationStatus === "FAILED" && (
+                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800 flex items-center gap-1">
+                          ✗ Failed
+                        </span>
+                      )}
+                      <span
+                        className={`px-3 py-1 text-sm font-medium rounded-full ${
+                          listing.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800"
+                            : listing.status === "SOLD"
+                            ? "bg-blue-100 text-blue-800"
+                            : listing.status === "EXPIRED"
+                            ? "bg-gray-100 text-gray-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {listing.status}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-6 text-sm text-gray-600">
@@ -107,6 +124,14 @@ export default async function MyListingsPage() {
                   >
                     View
                   </Link>
+                  {listing.transferCode && (
+                    <Link
+                      href={`/listings/${listing.id}/transfer-instructions`}
+                      className="px-4 py-2 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-50 font-medium"
+                    >
+                      📧 Instructions
+                    </Link>
+                  )}
                   {listing.status === "ACTIVE" && (
                     <Link
                       href={`/listings/${listing.id}/edit`}
