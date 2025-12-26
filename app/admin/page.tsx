@@ -12,6 +12,7 @@ async function getAdminStats() {
     completedTransactions,
     disputedTransactions,
     openDisputes,
+    pendingTransfers,
     totalRevenue,
   ] = await Promise.all([
     prisma.user.count(),
@@ -21,6 +22,12 @@ async function getAdminStats() {
     prisma.transaction.count({ where: { status: "COMPLETED" } }),
     prisma.transaction.count({ where: { status: "DISPUTED" } }),
     prisma.dispute.count({ where: { status: { in: ["OPEN", "INVESTIGATING"] } } }),
+    prisma.transaction.count({
+      where: {
+        status: "COMPLETED",
+        transferStatus: "PENDING"
+      }
+    }),
     prisma.transaction.aggregate({
       where: { status: "COMPLETED" },
       _sum: { amount: true },
@@ -35,6 +42,7 @@ async function getAdminStats() {
     completedTransactions,
     disputedTransactions,
     openDisputes,
+    pendingTransfers,
     totalRevenue: totalRevenue._sum.amount || 0,
   }
 }
@@ -139,6 +147,13 @@ export default async function AdminDashboardPage() {
       icon: "💰",
       color: "bg-green-50 text-green-600",
       link: "/admin/transactions",
+    },
+    {
+      title: "Pending Transfers",
+      value: stats.pendingTransfers,
+      icon: "📦",
+      color: "bg-yellow-50 text-yellow-600",
+      link: "/admin/transfers",
     },
     {
       title: "Open Disputes",
@@ -307,6 +322,13 @@ export default async function AdminDashboardPage() {
             >
               <span className="text-2xl">🎫</span>
               <span className="font-medium text-gray-900">Review Listings</span>
+            </Link>
+            <Link
+              href="/admin/transfers"
+              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 transition"
+            >
+              <span className="text-2xl">📦</span>
+              <span className="font-medium text-gray-900">Transfer Queue</span>
             </Link>
             <Link
               href="/admin/disputes"
