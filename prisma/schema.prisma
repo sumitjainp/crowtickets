@@ -86,6 +86,13 @@ model Transaction {
   stripePaymentIntentId String?
   status                String            @default("PENDING")
   releasedAt            DateTime?
+
+  // Transfer tracking fields
+  transferStatus        String            @default("PENDING") // PENDING, COMPLETED, FAILED
+  transferredAt         DateTime?
+  transferNotes         String?
+  transferredBy         String?           // Admin user ID who completed transfer
+
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
 
@@ -98,6 +105,7 @@ model Transaction {
   @@index([buyerId])
   @@index([sellerId])
   @@index([status])
+  @@index([transferStatus])
 }
 
 model Review {
