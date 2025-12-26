@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { formatCurrency, formatDateTime } from "@/lib/utils"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth-helpers"
+import CancelListingButton from "./CancelListingButton"
 
 async function getListing(id: string) {
   const listing = await prisma.listing.findUnique({
@@ -68,17 +69,32 @@ export default async function ListingDetailPage({
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
                       {listing.title}
                     </h1>
-                    <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                      {listing.category}
-                    </span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {listing.verificationStatus === "VERIFIED" && (
+                        <span className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                          ✓ Verified
+                        </span>
+                      )}
+                      {listing.verificationStatus === "PENDING" && (
+                        <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                          ⏳ Pending Verification
+                        </span>
+                      )}
+                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                        {listing.category}
+                      </span>
+                    </div>
                   </div>
-                  {isOwner && (
-                    <Link
-                      href={`/listings/${listing.id}/edit`}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                    >
-                      Edit
-                    </Link>
+                  {isOwner && listing.status === "ACTIVE" && (
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/listings/${listing.id}/edit`}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                      >
+                        Edit
+                      </Link>
+                      <CancelListingButton listingId={listing.id} />
+                    </div>
                   )}
                 </div>
 
@@ -105,6 +121,66 @@ export default async function ListingDetailPage({
                     {listing.description}
                   </p>
                 </div>
+
+                {/* Seller Instructions - Only show if owner and not verified */}
+                {isOwner && listing.verificationStatus !== "VERIFIED" && listing.transferCode && (
+                  <div className="mb-6 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="text-3xl">⏳</div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-1">
+                          Action Required: Transfer Your Tickets
+                        </h2>
+                        <p className="text-sm text-gray-700">
+                          Your listing will be activated once we verify your ticket transfer
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="bg-white border border-yellow-200 rounded-lg p-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Transfer To (Email):
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 bg-gray-50 px-3 py-2 rounded border text-sm font-mono">
+                            {listing.escrowEmail}
+                          </code>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(listing.escrowEmail || "")}
+                            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="bg-white border border-yellow-200 rounded-lg p-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Transfer Code (Include in Message):
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 bg-gray-50 px-3 py-2 rounded border text-lg font-mono font-bold">
+                            {listing.transferCode}
+                          </code>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(listing.transferCode || "")}
+                            className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm font-semibold"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+
+                      <Link
+                        href={`/listings/${listing.id}/transfer-instructions`}
+                        className="block w-full bg-yellow-600 text-white py-3 rounded-lg hover:bg-yellow-700 font-semibold text-center"
+                      >
+                        📧 View Full Instructions
+                      </Link>
+                    </div>
+                  </div>
+                )}
 
                 {/* Cancellation Policy Section */}
                 <div className="mb-6">

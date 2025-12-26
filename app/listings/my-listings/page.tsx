@@ -60,11 +60,15 @@ export default async function MyListingsPage() {
             {listings.map((listing) => (
               <div
                 key={listing.id}
-                className="bg-white rounded-lg shadow hover:shadow-md transition p-6 flex items-center gap-6"
+                className="bg-white rounded-lg shadow hover:shadow-md transition flex items-center gap-6 relative"
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-4xl">🎫</span>
-                </div>
+                <Link
+                  href={`/listings/${listing.id}`}
+                  className="flex items-center gap-6 flex-1 p-6 min-w-0"
+                >
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-4xl">🎫</span>
+                  </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
@@ -116,17 +120,13 @@ export default async function MyListingsPage() {
                     <span>Listed {formatDate(listing.createdAt)}</span>
                   </div>
                 </div>
+                </Link>
 
-                <div className="flex gap-2 flex-shrink-0">
-                  <Link
-                    href={`/listings/${listing.id}`}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
-                  >
-                    View
-                  </Link>
+                <div className="flex gap-2 flex-shrink-0 pr-6 relative z-10">
                   {listing.transferCode && (
                     <Link
                       href={`/listings/${listing.id}/transfer-instructions`}
+                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-50 font-medium"
                     >
                       📧 Instructions
@@ -135,6 +135,7 @@ export default async function MyListingsPage() {
                   {listing.status === "ACTIVE" && (
                     <Link
                       href={`/listings/${listing.id}/edit`}
+                      onClick={(e) => e.stopPropagation()}
                       className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
                     >
                       Edit
