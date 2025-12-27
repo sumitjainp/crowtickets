@@ -30,7 +30,9 @@ export default function TransferCard({ transfer }: TransferCardProps) {
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
   const [showFailDialog, setShowFailDialog] = useState(false)
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false)
   const [failReason, setFailReason] = useState("")
+  const [completeNotes, setCompleteNotes] = useState("")
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
   const { listing, buyer, seller } = transfer
@@ -44,16 +46,22 @@ export default function TransferCard({ transfer }: TransferCardProps) {
   }
 
   const handleMarkComplete = async () => {
-    if (!confirm("Have you completed the transfer to the buyer?")) return
+    if (!completeNotes.trim()) {
+      alert("Please provide confirmation details")
+      return
+    }
 
     setIsProcessing(true)
     try {
       const response = await fetch(`/api/admin/transfers/${transfer.id}/complete`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: completeNotes }),
       })
 
       if (response.ok) {
         router.refresh()
+        setShowCompleteDialog(false)
       } else {
         alert("Failed to mark transfer as complete")
       }
@@ -218,7 +226,7 @@ export default function TransferCard({ transfer }: TransferCardProps) {
             </button>
 
             <button
-              onClick={handleMarkComplete}
+              onClick={() => setShowCompleteDialog(true)}
               disabled={isProcessing}
               className="flex-1 min-w-[200px] bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
             >
@@ -249,6 +257,50 @@ export default function TransferCard({ transfer }: TransferCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Complete Dialog */}
+      {showCompleteDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Confirm Transfer Complete
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Please confirm you have completed the transfer and provide details:
+            </p>
+            <textarea
+              value={completeNotes}
+              onChange={(e) => setCompleteNotes(e.target.value)}
+              placeholder="E.g., Transfer completed successfully via Ticketmaster at 3:45pm. Confirmation email received. Screenshot saved."
+              className="w-full border border-gray-300 rounded-lg p-3 mb-4 h-32"
+            />
+            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-800">
+                <strong>⚠️ Important:</strong> Only mark as complete if you have successfully transferred the tickets to <strong>{buyer.email}</strong> and received confirmation from the platform.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCompleteDialog(false)
+                  setCompleteNotes("")
+                }}
+                disabled={isProcessing}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMarkComplete}
+                disabled={isProcessing || !completeNotes.trim()}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium disabled:opacity-50"
+              >
+                {isProcessing ? "Saving..." : "Confirm Complete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fail Dialog */}
       {showFailDialog && (

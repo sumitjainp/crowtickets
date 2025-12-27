@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { notifyBuyerTransferComplete } from "@/lib/email"
 
 export async function POST(
   req: Request,
@@ -46,11 +47,16 @@ export async function POST(
       },
     })
 
-    // TODO: Send email notification to buyer
-    // await sendEmail(transaction.buyer.email, {
-    //   subject: "Your Tickets Have Been Sent! 🎫",
-    //   body: `Your tickets for ${transaction.listing.title} have been transferred...`
-    // })
+    // Send email notification to buyer
+    await notifyBuyerTransferComplete({
+      buyerEmail: transaction.buyer.email,
+      buyerName: transaction.buyer.name || "Customer",
+      listingTitle: transaction.listing.title,
+      eventName: transaction.listing.eventName || transaction.listing.title,
+      eventDate: transaction.listing.eventDate,
+      venue: transaction.listing.venue || "TBA",
+      ticketType: transaction.listing.ticketType,
+    })
 
     return NextResponse.json({
       success: true,

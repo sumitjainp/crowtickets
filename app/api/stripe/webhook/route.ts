@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { stripe } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
+import { notifyAdminNewTransfer } from "@/lib/email"
 import Stripe from "stripe"
 
 export async function POST(req: Request) {
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
           },
           include: {
             listing: true,
+            buyer: true,
           },
         })
 
@@ -75,7 +77,15 @@ export async function POST(req: Request) {
           `Payment successful for transaction ${transaction.id}, funds are now in escrow`
         )
 
-        // TODO: Send email notifications to buyer and seller
+        // Send admin notification for pending transfer
+        await notifyAdminNewTransfer({
+          transactionId: transaction.id,
+          listingTitle: transaction.listing.title,
+          buyerEmail: transaction.buyer.email,
+          amount: transaction.amount,
+          transferCode: transaction.listing.transferCode || "N/A",
+        })
+
         break
       }
 
