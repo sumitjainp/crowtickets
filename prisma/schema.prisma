@@ -48,6 +48,7 @@ model Listing {
   title              String
   description        String
   price              Float
+  quantity           Int            @default(1)      // Number of tickets (1-10)
   eventDate          DateTime
   eventName          String
   venue              String
@@ -55,6 +56,7 @@ model Listing {
   status             String         @default("ACTIVE")
   cancellationPolicy String         @default("MODERATE")
   ticketFileUrl      String?
+  allowCounterOffers Boolean        @default(false)  // Allow buyers to propose different prices
 
   // New fields for multiple ticket types
   ticketType         String         @default("PDF")  // PDF, TICKETMASTER, AXS, OTHER

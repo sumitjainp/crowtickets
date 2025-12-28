@@ -81,33 +81,32 @@ export default async function MyListingsPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                      {listing.verificationStatus === "VERIFIED" && (
-                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800 flex items-center gap-1">
-                          ✓ Verified
-                        </span>
-                      )}
-                      {listing.verificationStatus === "PENDING" && (
-                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1">
-                          ⏳ Pending
-                        </span>
-                      )}
-                      {listing.verificationStatus === "FAILED" && (
-                        <span className="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800 flex items-center gap-1">
-                          ✗ Failed
-                        </span>
-                      )}
                       <span
                         className={`px-3 py-1 text-sm font-medium rounded-full ${
-                          listing.status === "ACTIVE"
-                            ? "bg-green-100 text-green-800"
-                            : listing.status === "SOLD"
+                          listing.status === "SOLD"
                             ? "bg-blue-100 text-blue-800"
+                            : listing.status === "CANCELLED"
+                            ? "bg-red-100 text-red-800"
                             : listing.status === "EXPIRED"
                             ? "bg-gray-100 text-gray-800"
+                            : listing.verificationStatus === "VERIFIED"
+                            ? "bg-green-100 text-green-800"
+                            : listing.verificationStatus === "PENDING"
+                            ? "bg-yellow-100 text-yellow-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {listing.status}
+                        {listing.status === "SOLD"
+                          ? "Sold"
+                          : listing.status === "CANCELLED"
+                          ? "Cancelled"
+                          : listing.status === "EXPIRED"
+                          ? "Expired"
+                          : listing.verificationStatus === "VERIFIED"
+                          ? "✓ Active"
+                          : listing.verificationStatus === "PENDING"
+                          ? "⏳ Awaiting Verification"
+                          : "✗ Verification Failed"}
                       </span>
                     </div>
                   </div>
