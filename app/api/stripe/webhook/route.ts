@@ -2,7 +2,11 @@ import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { stripe } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
-import { notifyAdminNewTransfer } from "@/lib/email"
+import {
+  notifyAdminNewTransfer,
+  notifyBuyerPaymentSuccess,
+  notifySellerTicketSold
+} from "@/lib/email"
 import Stripe from "stripe"
 
 export async function POST(req: Request) {
@@ -47,6 +51,7 @@ export async function POST(req: Request) {
           include: {
             listing: true,
             buyer: true,
+            seller: true,
           },
         })
 
@@ -77,14 +82,40 @@ export async function POST(req: Request) {
           `Payment successful for transaction ${transaction.id}, funds are now in escrow`
         )
 
-        // Send admin notification for pending transfer
-        await notifyAdminNewTransfer({
-          transactionId: transaction.id,
-          listingTitle: transaction.listing.title,
-          buyerEmail: transaction.buyer.email,
-          amount: transaction.amount,
-          transferCode: transaction.listing.transferCode || "N/A",
-        })
+        // Send all email notifications
+        await Promise.all([
+          // Admin notification for pending transfer
+          notifyAdminNewTransfer({
+            transactionId: transaction.id,
+            listingTitle: transaction.listing.title,
+            buyerEmail: transaction.buyer.email,
+            amount: transaction.amount,
+            transferCode: transaction.listing.transferCode || "N/A",
+          }),
+          // Buyer confirmation email
+          notifyBuyerPaymentSuccess({
+            buyerEmail: transaction.buyer.email,
+            buyerName: transaction.buyer.name,
+            listingTitle: transaction.listing.title,
+            eventName: transaction.listing.eventName,
+            eventDate: transaction.listing.eventDate,
+            venue: transaction.listing.venue,
+            amount: transaction.amount,
+            transactionId: transaction.id,
+          }),
+          // Seller notification
+          notifySellerTicketSold({
+            sellerEmail: transaction.seller.email,
+            sellerName: transaction.seller.name,
+            listingTitle: transaction.listing.title,
+            eventName: transaction.listing.eventName,
+            buyerName: transaction.buyer.name,
+            amount: transaction.amount,
+            transactionId: transaction.id,
+          }),
+        ])
+
+        console.log("✅ All email notifications sent successfully")
 
         break
       }

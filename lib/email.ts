@@ -344,3 +344,193 @@ export async function notifyTransferFailed({
     html: buyerHtml,
   })
 }
+
+// Notify buyer when payment is successful
+export async function notifyBuyerPaymentSuccess({
+  buyerEmail,
+  buyerName,
+  listingTitle,
+  eventName,
+  eventDate,
+  venue,
+  amount,
+  transactionId,
+}: {
+  buyerEmail: string
+  buyerName: string
+  listingTitle: string
+  eventName: string
+  eventDate: Date
+  venue: string
+  amount: number
+  transactionId: string
+}) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #10b981; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+          .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+          .footer { background: #f3f4f6; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; font-size: 12px; color: #6b7280; }
+          .success-box { background: #d1fae5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin: 15px 0; text-align: center; }
+          .info-box { background: white; border-left: 4px solid #2563eb; padding: 15px; margin: 15px 0; }
+          .timeline { background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin: 15px 0; }
+          .button { display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 10px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0;">✅ Payment Confirmed!</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${buyerName},</p>
+
+            <div class="success-box">
+              <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+              <h2 style="margin: 0; color: #065f46;">Your payment was successful!</h2>
+              <p style="margin: 5px 0 0 0;">Your funds are securely held in escrow</p>
+            </div>
+
+            <div class="info-box">
+              <p><strong>Event:</strong> ${eventName}</p>
+              <p><strong>Venue:</strong> ${venue}</p>
+              <p><strong>Date:</strong> ${new Date(eventDate).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}</p>
+              <p><strong>Amount Paid:</strong> $${(amount / 100).toFixed(2)}</p>
+            </div>
+
+            <div class="timeline">
+              <h3 style="margin-top: 0; color: #1e40af;">📋 What Happens Next:</h3>
+              <ol style="margin: 0; padding-left: 20px; color: #1e40af;">
+                <li style="margin: 8px 0;"><strong>Our admin team will transfer the ticket to your email</strong> - This typically happens within 24 hours</li>
+                <li style="margin: 8px 0;"><strong>You'll receive a transfer email</strong> from the ticket platform (Ticketmaster, AXS, etc.)</li>
+                <li style="margin: 8px 0;"><strong>Accept the transfer</strong> in your ticket platform account</li>
+                <li style="margin: 8px 0;"><strong>Confirm receipt</strong> in your transaction dashboard</li>
+                <li style="margin: 8px 0;"><strong>Funds released to seller</strong> after you confirm</li>
+              </ol>
+            </div>
+
+            <center>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || "https://crowtickets.vercel.app"}/transactions/${transactionId}" class="button">
+                View Transaction Details →
+              </a>
+            </center>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin: 15px 0;">
+              <strong>🔒 Your Protection:</strong> Your funds are held securely in escrow and won't be released to the seller until you confirm you've received the tickets.
+            </div>
+
+            <p>Questions? Contact us at support@crowtickets.com</p>
+          </div>
+          <div class="footer">
+            <p>CrowTickets - Secure Ticket Escrow</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+
+  return sendEmail({
+    to: buyerEmail,
+    subject: `✅ Payment Confirmed - ${eventName}`,
+    html,
+  })
+}
+
+// Notify seller when their ticket is sold
+export async function notifySellerTicketSold({
+  sellerEmail,
+  sellerName,
+  listingTitle,
+  eventName,
+  buyerName,
+  amount,
+  transactionId,
+}: {
+  sellerEmail: string
+  sellerName: string
+  listingTitle: string
+  eventName: string
+  buyerName: string
+  amount: number
+  transactionId: string
+}) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+          .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+          .footer { background: #f3f4f6; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; font-size: 12px; color: #6b7280; }
+          .success-box { background: #dbeafe; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; margin: 15px 0; text-align: center; }
+          .info-box { background: white; border-left: 4px solid #10b981; padding: 15px; margin: 15px 0; }
+          .button { display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 10px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="margin: 0;">🎉 Your Ticket Sold!</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${sellerName},</p>
+
+            <div class="success-box">
+              <div style="font-size: 48px; margin-bottom: 10px;">💰</div>
+              <h2 style="margin: 0; color: #1e40af;">Great news! Your ticket has been purchased</h2>
+            </div>
+
+            <div class="info-box">
+              <p><strong>Listing:</strong> ${listingTitle}</p>
+              <p><strong>Event:</strong> ${eventName}</p>
+              <p><strong>Buyer:</strong> ${buyerName}</p>
+              <p><strong>Sale Amount:</strong> $${(amount / 100).toFixed(2)}</p>
+            </div>
+
+            <h3>📋 What Happens Next:</h3>
+            <ol style="color: #374151;">
+              <li style="margin: 8px 0;"><strong>Our admin team will handle the ticket transfer</strong> - You don't need to do anything!</li>
+              <li style="margin: 8px 0;"><strong>The buyer will receive the tickets</strong> via email transfer</li>
+              <li style="margin: 8px 0;"><strong>Buyer confirms receipt</strong> in their dashboard</li>
+              <li style="margin: 8px 0;"><strong>We release the funds to you</strong> - typically within 24-48 hours of buyer confirmation</li>
+            </ol>
+
+            <center>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || "https://crowtickets.vercel.app"}/transactions/${transactionId}" class="button">
+                View Transaction Details →
+              </a>
+            </center>
+
+            <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 12px; margin: 15px 0;">
+              <strong>💵 Payment Secured:</strong> The buyer's payment of $${(amount / 100).toFixed(2)} is held in escrow and will be released to you once the buyer confirms receipt.
+            </div>
+
+            <p>Thank you for using CrowTickets!</p>
+          </div>
+          <div class="footer">
+            <p>CrowTickets - Secure Ticket Escrow</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+
+  return sendEmail({
+    to: sellerEmail,
+    subject: `🎉 Your Ticket Sold - ${eventName}`,
+    html,
+  })
+}

@@ -248,13 +248,46 @@ export default async function TransactionDetailPage({
 
             {transaction.status === "ESCROWED" && isBuyer && (
               <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800 mb-3">
-                    <strong>Funds in Escrow:</strong> Your payment is securely
-                    held. Once you receive the ticket, confirm receipt below to
-                    release funds to the seller.
-                  </p>
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="text-3xl">⏳</div>
+                    <div>
+                      <h3 className="font-bold text-blue-900 text-lg mb-2">
+                        Payment Received - Ticket Transfer in Progress
+                      </h3>
+                      <p className="text-sm text-blue-800 mb-3">
+                        Your payment is securely held in escrow. Here's what happens next:
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg p-4 mb-3">
+                    <h4 className="font-semibold text-blue-900 mb-3 text-sm">📋 Next Steps:</h4>
+                    <ol className="space-y-3 text-sm text-blue-900">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">1.</span>
+                        <span><strong>Admin transfers ticket to your email</strong> - Typically within 24 hours</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">2.</span>
+                        <span><strong>Check your email</strong> for transfer notification from the ticket platform (Ticketmaster, AXS, etc.)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">3.</span>
+                        <span><strong>Accept the transfer</strong> in your ticket platform account</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">4.</span>
+                        <span><strong>Confirm receipt below</strong> to release funds to seller</span>
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div className="bg-green-50 border-l-4 border-green-500 p-3 text-sm text-green-800">
+                    <strong>🔒 Your Protection:</strong> Funds won't be released until you confirm you've received the tickets.
+                  </div>
                 </div>
+
                 <ConfirmReceiptButton transactionId={transaction.id} />
                 <CancelTransactionButton
                   transactionId={transaction.id}
@@ -277,13 +310,42 @@ export default async function TransactionDetailPage({
 
             {transaction.status === "ESCROWED" && isSeller && (
               <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Funds in Escrow:</strong> The buyer's payment is
-                    securely held. Please transfer the ticket to the buyer. Funds
-                    will be released once the buyer confirms receipt.
-                  </p>
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="text-3xl">💰</div>
+                    <div>
+                      <h3 className="font-bold text-blue-900 text-lg mb-2">
+                        Payment Secured - Transfer in Progress
+                      </h3>
+                      <p className="text-sm text-blue-800">
+                        Great news! The buyer's payment is securely held in escrow.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg p-4 mb-3">
+                    <h4 className="font-semibold text-blue-900 mb-3 text-sm">📋 What Happens Next:</h4>
+                    <ol className="space-y-2 text-sm text-blue-900">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">1.</span>
+                        <span><strong>Our admin team handles the ticket transfer</strong> - No action needed from you!</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">2.</span>
+                        <span><strong>Buyer receives and confirms</strong> the ticket</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold min-w-[20px]">3.</span>
+                        <span><strong>Funds released to you</strong> within 24-48 hours of confirmation</span>
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div className="bg-green-50 border-l-4 border-green-500 p-3 text-sm text-green-800">
+                    <strong>💵 Your Earnings:</strong> ${(transaction.amount / 100).toFixed(2)} will be released once buyer confirms receipt.
+                  </div>
                 </div>
+
                 <div className="flex items-center gap-3 pt-4">
                   <span className="text-sm text-gray-600">Having issues?</span>
                   <Link
