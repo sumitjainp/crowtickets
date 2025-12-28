@@ -4,6 +4,7 @@ import { formatCurrency, formatDateTime } from "@/lib/utils"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth-helpers"
 import CancelListingButton from "./CancelListingButton"
+import CopyButton from "./CopyButton"
 
 async function getListing(id: string) {
   const listing = await prisma.listing.findUnique({
@@ -146,12 +147,7 @@ export default async function ListingDetailPage({
                           <code className="flex-1 bg-gray-50 px-3 py-2 rounded border text-sm font-mono">
                             {listing.escrowEmail}
                           </code>
-                          <button
-                            onClick={() => navigator.clipboard.writeText(listing.escrowEmail || "")}
-                            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
-                          >
-                            Copy
-                          </button>
+                          <CopyButton text={listing.escrowEmail || ""} />
                         </div>
                       </div>
 
@@ -163,12 +159,7 @@ export default async function ListingDetailPage({
                           <code className="flex-1 bg-gray-50 px-3 py-2 rounded border text-lg font-mono font-bold">
                             {listing.transferCode}
                           </code>
-                          <button
-                            onClick={() => navigator.clipboard.writeText(listing.transferCode || "")}
-                            className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm font-semibold"
-                          >
-                            Copy
-                          </button>
+                          <CopyButton text={listing.transferCode || ""} variant="purple" />
                         </div>
                       </div>
 
