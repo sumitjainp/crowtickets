@@ -19,6 +19,7 @@ export default function EditListingPage({
     title: "",
     description: "",
     price: "",
+    quantity: "1",
     eventDate: "",
     eventName: "",
     venue: "",
@@ -26,6 +27,7 @@ export default function EditListingPage({
     cancellationPolicy: "MODERATE",
     ticketType: "PDF",
     ticketPlatform: "TICKETMASTER",
+    allowCounterOffers: false,
   })
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function EditListingPage({
           title: data.title,
           description: data.description,
           price: data.price.toString(),
+          quantity: data.quantity?.toString() || "1",
           eventDate: localDate,
           eventName: data.eventName,
           venue: data.venue,
@@ -62,6 +65,7 @@ export default function EditListingPage({
           cancellationPolicy: data.cancellationPolicy,
           ticketType: ["TICKETMASTER", "AXS", "STUBHUB", "SEATGEEK", "VIVID_SEATS", "GAMETIME", "OTHER"].includes(data.ticketType) ? "TRANSFER" : "PDF",
           ticketPlatform: ["TICKETMASTER", "AXS", "STUBHUB", "SEATGEEK", "VIVID_SEATS", "GAMETIME", "OTHER"].includes(data.ticketType) ? data.ticketType : "TICKETMASTER",
+          allowCounterOffers: data.allowCounterOffers || false,
         })
         setIsLoading(false)
       } catch (err) {
@@ -76,9 +80,12 @@ export default function EditListingPage({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     })
   }
 
@@ -96,9 +103,11 @@ export default function EditListingPage({
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
+          quantity: parseInt(formData.quantity),
           eventDate: new Date(formData.eventDate).toISOString(),
           ticketType: formData.ticketType,
           ticketPlatform: formData.ticketPlatform,
+          allowCounterOffers: formData.allowCounterOffers,
         }),
       })
 
@@ -323,6 +332,26 @@ export default function EditListingPage({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
+
+            <div>
+              <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
+                Quantity *
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                required
+                min="1"
+                max="10"
+                value={formData.quantity}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Number of tickets (1-10)
+              </p>
+            </div>
           </div>
 
           <div>
@@ -374,6 +403,26 @@ export default function EditListingPage({
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+
+          {/* Allow Counter Offers */}
+          <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <input
+              type="checkbox"
+              id="allowCounterOffers"
+              name="allowCounterOffers"
+              checked={formData.allowCounterOffers}
+              onChange={handleChange}
+              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <div className="flex-1">
+              <label htmlFor="allowCounterOffers" className="block text-sm font-medium text-gray-900 cursor-pointer">
+                💬 Allow Counter Offers
+              </label>
+              <p className="text-sm text-gray-600 mt-1">
+                Let buyers propose a different price. You can accept, decline, or counter their offer.
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-4">

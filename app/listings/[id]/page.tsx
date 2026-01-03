@@ -114,6 +114,24 @@ export default async function ListingDetailPage({
                     <div className="text-sm text-gray-600 mb-1">Venue</div>
                     <div className="font-semibold">{listing.venue}</div>
                   </div>
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Quantity</div>
+                    <div className="font-semibold">
+                      {listing.quantity} {listing.quantity === 1 ? "ticket" : "tickets"}
+                    </div>
+                  </div>
+                  {listing.allowCounterOffers && (
+                    <div className="col-span-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full font-medium">
+                          💬 Counter Offers Accepted
+                        </span>
+                        <span className="text-gray-600">
+                          You can propose a different price to the seller
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-6">
@@ -248,10 +266,17 @@ export default async function ListingDetailPage({
             {/* Price card */}
             <div className="bg-white rounded-lg shadow p-6 mb-6 sticky top-4">
               <div className="mb-6">
-                <div className="text-sm text-gray-600 mb-1">Price</div>
+                <div className="text-sm text-gray-600 mb-1">
+                  {listing.quantity > 1 ? `Total Price (${listing.quantity} tickets)` : "Price"}
+                </div>
                 <div className="text-4xl font-bold text-blue-600">
                   {formatCurrency(listing.price)}
                 </div>
+                {listing.quantity > 1 && (
+                  <div className="text-sm text-gray-600 mt-2">
+                    {formatCurrency(listing.price / listing.quantity)} per ticket
+                  </div>
+                )}
               </div>
 
               {!isOwner && listing.status === "ACTIVE" && (
