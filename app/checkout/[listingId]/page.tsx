@@ -64,7 +64,17 @@ export default async function CheckoutPage({
             <div className="text-sm text-gray-600 mb-1">
               {listing.eventName}
             </div>
-            <div className="text-sm text-gray-600">{listing.venue}</div>
+            <div className="text-sm text-gray-600 mb-2">{listing.venue}</div>
+            <div className="flex items-center gap-2 mt-3">
+              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
+                {listing.quantity} {listing.quantity === 1 ? "Ticket" : "Tickets"}
+              </span>
+              {listing.quantity > 1 && (
+                <span className="text-sm text-gray-600">
+                  ${(listing.price / listing.quantity).toFixed(2)} per ticket
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Total</span>

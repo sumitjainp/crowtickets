@@ -49,6 +49,7 @@ model Listing {
   description        String
   price              Float
   quantity           Int            @default(1)      // Number of tickets (1-10)
+  sellAsGroup        Boolean        @default(true)   // If true, all tickets sold together; if false, can sell individually
   eventDate          DateTime
   eventName          String
   venue              String

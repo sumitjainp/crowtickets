@@ -55,21 +55,54 @@ export async function POST(req: Request) {
     }
 
     // Check if there's already a pending transaction for this listing
+    // Only block if transaction is recent (within last 30 minutes) or ESCROWED
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
+
     const existingTransaction = await prisma.transaction.findFirst({
       where: {
         listingId,
-        status: {
-          in: ["PENDING", "ESCROWED"],
-        },
+        OR: [
+          {
+            status: "ESCROWED",
+          },
+          {
+            status: "PENDING",
+            createdAt: {
+              gte: thirtyMinutesAgo,
+            },
+          },
+        ],
       },
     })
 
     if (existingTransaction) {
+      // Clean up stale PENDING transactions older than 30 minutes
+      await prisma.transaction.deleteMany({
+        where: {
+          listingId,
+          status: "PENDING",
+          createdAt: {
+            lt: thirtyMinutesAgo,
+          },
+        },
+      })
+
       return NextResponse.json(
-        { error: "This listing already has a pending transaction" },
+        { error: "This listing already has a pending transaction. Please try again in a few minutes." },
         { status: 400 }
       )
     }
+
+    // Clean up any old PENDING transactions before creating a new one
+    await prisma.transaction.deleteMany({
+      where: {
+        listingId,
+        status: "PENDING",
+        createdAt: {
+          lt: thirtyMinutesAgo,
+        },
+      },
+    })
 
     // Convert amount to cents for Stripe
     const amountInCents = formatAmountForStripe(listing.price)

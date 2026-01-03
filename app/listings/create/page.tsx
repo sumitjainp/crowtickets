@@ -14,6 +14,7 @@ export default function CreateListingPage() {
     description: "",
     price: "",
     quantity: "1",
+    sellAsGroup: true,
     eventDate: "",
     eventName: "",
     venue: "",
@@ -51,6 +52,7 @@ export default function CreateListingPage() {
           ...formData,
           price: parseFloat(formData.price),
           quantity: parseInt(formData.quantity),
+          sellAsGroup: formData.sellAsGroup,
           eventDate: new Date(formData.eventDate).toISOString(),
         }),
       })
@@ -280,6 +282,28 @@ export default function CreateListingPage() {
               </p>
             </div>
           </div>
+
+          {/* Sell as Group option - only show if quantity > 1 */}
+          {parseInt(formData.quantity) > 1 && (
+            <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <input
+                type="checkbox"
+                id="sellAsGroup"
+                name="sellAsGroup"
+                checked={formData.sellAsGroup}
+                onChange={handleChange}
+                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <div className="flex-1">
+                <label htmlFor="sellAsGroup" className="block text-sm font-medium text-gray-900 cursor-pointer">
+                  🎫 Sell All Tickets Together
+                </label>
+                <p className="text-sm text-gray-600 mt-1">
+                  If checked, buyers must purchase all {formData.quantity} tickets at once. Uncheck to allow individual ticket purchases.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
