@@ -54,53 +54,28 @@ export async function POST(req: Request) {
       )
     }
 
-    // Check if there's already a pending transaction for this listing
-    // Only block if transaction is recent (within last 5 minutes) or ESCROWED
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
-
+    // Only block if there's an ESCROWED transaction (payment actually succeeded)
+    // PENDING transactions don't block - they're just payment intents, not completed purchases
     const existingTransaction = await prisma.transaction.findFirst({
       where: {
         listingId,
-        OR: [
-          {
-            status: "ESCROWED",
-          },
-          {
-            status: "PENDING",
-            createdAt: {
-              gte: fiveMinutesAgo,
-            },
-          },
-        ],
+        status: "ESCROWED",
       },
     })
 
     if (existingTransaction) {
-      // Clean up stale PENDING transactions older than 5 minutes
-      await prisma.transaction.deleteMany({
-        where: {
-          listingId,
-          status: "PENDING",
-          createdAt: {
-            lt: fiveMinutesAgo,
-          },
-        },
-      })
-
       return NextResponse.json(
-        { error: "This listing already has a pending transaction. Please try again in a few minutes." },
+        { error: "This listing has already been sold" },
         { status: 400 }
       )
     }
 
-    // Clean up any old PENDING transactions before creating a new one
+    // Clean up any abandoned PENDING transactions for this listing
+    // These are from users who started checkout but never completed payment
     await prisma.transaction.deleteMany({
       where: {
         listingId,
         status: "PENDING",
-        createdAt: {
-          lt: fiveMinutesAgo,
-        },
       },
     })
 
