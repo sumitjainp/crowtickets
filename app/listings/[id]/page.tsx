@@ -120,18 +120,6 @@ export default async function ListingDetailPage({
                       {listing.quantity} {listing.quantity === 1 ? "ticket" : "tickets"}
                     </div>
                   </div>
-                  {listing.allowCounterOffers && (
-                    <div className="col-span-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full font-medium">
-                          💬 Counter Offers Accepted
-                        </span>
-                        <span className="text-gray-600">
-                          You can propose a different price to the seller
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <div className="mb-6">

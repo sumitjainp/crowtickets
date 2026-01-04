@@ -22,7 +22,6 @@ export default function CreateListingPage() {
     cancellationPolicy: "MODERATE",
     ticketType: "PDF", // PDF or TRANSFER
     ticketPlatform: "TICKETMASTER", // For transfer-based tickets
-    allowCounterOffers: false,
   })
 
   const handleChange = (
@@ -375,26 +374,6 @@ export default function CreateListingPage() {
             <p className="mt-1 text-sm text-gray-500">
               Include details like section, row, seat numbers, and any special features
             </p>
-          </div>
-
-          {/* Allow Counter Offers */}
-          <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <input
-              type="checkbox"
-              id="allowCounterOffers"
-              name="allowCounterOffers"
-              checked={formData.allowCounterOffers}
-              onChange={handleChange}
-              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <div className="flex-1">
-              <label htmlFor="allowCounterOffers" className="block text-sm font-medium text-gray-900 cursor-pointer">
-                💬 Allow Counter Offers
-              </label>
-              <p className="text-sm text-gray-600 mt-1">
-                Let buyers propose a different price. You can accept, decline, or counter their offer.
-              </p>
-            </div>
           </div>
 
           {/* PDF Upload section (only show if PDF selected) */}
