@@ -270,7 +270,7 @@ export default async function AdminDashboardPage() {
               {activity.recentTransactions.map((transaction) => (
                 <Link
                   key={transaction.id}
-                  href={`/admin/transactions/${transaction.id}`}
+                  href={`/transactions/${transaction.id}`}
                   className="block p-4 hover:bg-gray-50 transition"
                 >
                   <div className="flex items-center justify-between">
