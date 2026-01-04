@@ -14,7 +14,7 @@ async function createTestListing() {
         role: "SELLER",
         profile: {
           create: {
-            rating: 4.8,
+            satisfactionScore: 96.0,
             reviewCount: 15,
             verifiedEmail: true,
           },
@@ -24,18 +24,27 @@ async function createTestListing() {
 
     console.log("✓ Created test seller:", testSeller.name, `(${testSeller.email})`)
 
-    // Create a test listing
+    // Generate transfer code
+    const transferCode = `TM-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+
+    // Create a test listing with transfer type
     const testListing = await prisma.listing.create({
       data: {
         sellerId: testSeller.id,
-        title: "Taylor Swift Eras Tour - Floor Seats",
-        description: "Amazing floor seats for Taylor Swift's Eras Tour! Section A, Row 5. Great view of the stage. Tickets will be transferred via Ticketmaster within 24 hours of purchase.",
-        price: 450.00,
-        eventDate: new Date("2025-08-15T19:00:00"),
+        title: "2 Taylor Swift Eras Tour Tickets - Floor Seats",
+        description: "Amazing floor seats for Taylor Swift's Eras Tour! Section A, Row 5. Great view of the stage. Selling 2 tickets together. Tickets will be transferred via Ticketmaster within 24 hours of purchase.",
+        price: 900.00,
+        quantity: 2,
+        sellAsGroup: true,
+        eventDate: new Date("2026-08-15T19:00:00"),
         eventName: "Taylor Swift - The Eras Tour",
         venue: "SoFi Stadium, Los Angeles",
-        category: "Concert",
+        category: "Ticket",
         status: "ACTIVE",
+        ticketType: "TICKETMASTER",
+        transferCode: transferCode,
+        escrowEmail: "tickets@crowtickets.com",
+        verificationStatus: "VERIFIED",
       },
     })
 

@@ -55,8 +55,8 @@ export async function POST(req: Request) {
     }
 
     // Check if there's already a pending transaction for this listing
-    // Only block if transaction is recent (within last 30 minutes) or ESCROWED
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
+    // Only block if transaction is recent (within last 5 minutes) or ESCROWED
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
 
     const existingTransaction = await prisma.transaction.findFirst({
       where: {
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
           {
             status: "PENDING",
             createdAt: {
-              gte: thirtyMinutesAgo,
+              gte: fiveMinutesAgo,
             },
           },
         ],
@@ -76,13 +76,13 @@ export async function POST(req: Request) {
     })
 
     if (existingTransaction) {
-      // Clean up stale PENDING transactions older than 30 minutes
+      // Clean up stale PENDING transactions older than 5 minutes
       await prisma.transaction.deleteMany({
         where: {
           listingId,
           status: "PENDING",
           createdAt: {
-            lt: thirtyMinutesAgo,
+            lt: fiveMinutesAgo,
           },
         },
       })
@@ -99,7 +99,7 @@ export async function POST(req: Request) {
         listingId,
         status: "PENDING",
         createdAt: {
-          lt: thirtyMinutesAgo,
+          lt: fiveMinutesAgo,
         },
       },
     })
